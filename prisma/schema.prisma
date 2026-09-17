@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String
+  password     String
+  avatarUrl    String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  apks         Apk[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+model Apk {
+  id           String        @id @default(cuid())
+  name         String
+  originalName String
+  packageName  String?
+  version      String?
+  minSdk       String?
+  targetSdk    String?
+  filePath     String
+  fileSize     Int
+  sha256       String?
+  uploadedAt   DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mobsfScans   MobsfScan[]
+  firebaseRuns FirebaseRun[]
+
+  @@map("apks")
+}
+
+model MobsfScan {
+  id           String     @id @default(cuid())
+  apkId        String
+  apk          Apk        @relation(fields: [apkId], references: [id], onDelete: Cascade)
+  mobsfHash    String?
+  scanType     String     @default("static") // static | dynamic
+  status       ScanStatus @default(PENDING)
+  score        Float?
+  grade        String?    // A, B, C, D, F
+  riskLevel    String?    // HIGH, MEDIUM, LOW, INFO
+  reportJson   Json?
+  cvssScore    Float?
+  errorMessage String?
+  startedAt    DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("mobsf_scans")
+}
+
+model FirebaseRun {
+  id             String     @id @default(cuid())
+  apkId          String
+  apk            Apk        @relation(fields: [apkId], references: [id], onDelete: Cascade)
+  testMatrixId   String?
+  testType       String     @default("robo") // robo | instrumentation | game-loop
+  status         ScanStatus @default(PENDING)
+  devices        Json?      // lista de dispositivos
+  resultsJson    Json?
+  passedCount    Int        @default(0)
+  failedCount    Int        @default(0)
+  errorCount     Int        @default(0)
+  gcsResultsPath String?
+  errorMessage   String?
+  startedAt      DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@map("firebase_runs")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  message   String
+  read      Boolean          @default(false)
+  metadata  Json?
+  createdAt DateTime         @default(now())
+
+  @@map("notifications")
+}
+
+enum ScanStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum NotificationType {
+  SCAN_COMPLETE
+  SCAN_FAILED
+  FIREBASE_COMPLETE
+  FIREBASE_FAILED
+  INFO
+}

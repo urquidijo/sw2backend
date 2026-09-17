@@ -1,0 +1,68 @@
+# Compiled output
+dist/
+build/
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Uploads & Binary APKs (Crucial: prevents pushing large files > 100MB)
+uploads/*
+!uploads/.gitkeep
+*.apk
+*.aab
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+serviceAccountKey*.json
+*-credentials.json
+
+# TypeScript cache
+*.tsbuildinfo
+tsconfig.build.tsbuildinfo
+
+# Testing & Coverage
+coverage/
+.nyc_output/
+
+# Logs
+logs/
+*.log
+
+# Prisma generated / local databases (if sqlite used in dev)
+*.db
+*.db-journal
+*.sqlite
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# Temp / Cache
+.cache/
+.temp/
+tmp/
+temp/
